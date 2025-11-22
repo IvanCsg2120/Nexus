@@ -26,4 +26,3 @@ nav a {margin-left:25px; color:var(--dark); text-decoration:none; font-weight:50
 .project-grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:25px;}
 .project {background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.08);}
 .testimonial-card {background:var(--white); padding:25px; border-radius:var(--radius); box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:20px;}
-</style>
