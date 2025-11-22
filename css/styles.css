@@ -190,3 +190,73 @@ footer {
     margin-top: 40px;
     color: var(--text-dim);
 }
+.services-section {
+    margin-top: 40px;
+    padding: 40px 20px;
+    text-align: left;
+}
+
+.services-section h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.services-section .subtitle {
+    color: #b9b9c9;
+    margin-top: 8px;
+    margin-bottom: 30px;
+    font-size: 1.05rem;
+}
+
+/* GRID */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+}
+
+/* TARJETAS */
+.service-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 20px rgba(120, 70, 255, 0.15);
+    transition: all 0.25s ease;
+}
+
+/* HOVER estilo NFT */
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 35px rgba(160, 80, 255, 0.35);
+    border-color: rgba(180, 120, 255, 0.4);
+}
+
+/* Icono */
+.service-card .icon {
+    font-size: 2rem;
+    margin-bottom: 14px;
+}
+
+/* Título */
+.service-card h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+/* Descripción */
+.service-card p {
+    color: #cfcfe6;
+    font-size: 0.92rem;
+    margin-bottom: 16px;
+}
+
+/* Precio */
+.service-card .price {
+    color: #d4b3ff;
+    font-weight: 700;
+    font-size: 1rem;
+}
