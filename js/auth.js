@@ -1,48 +1,61 @@
-// js/auth.js
-// Login / logout / control de sesión (usando users en IndexedDB)
+// ===============================
+// FUNCIONES AUXILIARES
+// ===============================
+function clean(str) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
+// ===============================
+// INICIAR SESIÓN
+// ===============================
 async function login(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  const cedulaField = document.getElementById("cedula");
-  const nombreField = document.getElementById("nombre");
-  const cedula = cedulaField ? cedulaField.value.trim() : "";
-  const nombre = nombreField ? nombreField.value.trim() : "";
+  if (e) e.preventDefault();
 
-  if (!cedula || !nombre) {
+  const cedula = document.getElementById("cedula").value.trim();
+  const nombreInput = document.getElementById("nombre").value.trim();
+
+  if (!cedula || !nombreInput) {
     alert("Completa cédula y nombre.");
     return false;
   }
 
   await ensureDBReady();
   const users = await getAll("users");
-  
-  // Buscar usuario por cédula y nombre (case insensitive)
-  const u = users.find(x => 
-    x.cedula === cedula && 
-    x.nombre.toLowerCase() === nombre.toLowerCase()
+
+  const matchingUser = users.find(u =>
+    u.cedula === cedula &&
+    clean(u.nombre) === clean(nombreInput)
   );
-  
-  if (!u) {
+
+  if (!matchingUser) {
     alert("Cédula o nombre incorrectos.");
     return false;
   }
 
-  // crear sesión simple
-  const session = { 
-    id: u.id, 
-    cedula: u.cedula, 
-    nombre: u.nombre, 
-    email: u.email || '',
-    inicio: new Date().toISOString() 
+  const session = {
+    id: matchingUser.id,
+    nombre: matchingUser.nombre,
+    cedula: matchingUser.cedula,
+    email: matchingUser.email,
+    inicio: new Date().toISOString()
   };
+
   localStorage.setItem("sessionUser", JSON.stringify(session));
   location.href = "dashboard.html";
   return false;
 }
 
+// ===============================
+// REGISTRO DE USUARIO
+// ===============================
 async function register(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  
+  if (e) e.preventDefault();
+
   const nombre = document.getElementById("regNombre").value.trim();
   const apellido = document.getElementById("regApellido").value.trim();
   const cedula = document.getElementById("regCedula").value.trim();
@@ -55,65 +68,46 @@ async function register(e) {
 
   await ensureDBReady();
   const users = await getAll("users");
-  
-  // Verificar si ya existe la cédula
-  if (users.some(x => x.cedula === cedula)) {
+
+  if (users.some(u => u.cedula === cedula)) {
     alert("Ya existe un usuario con esta cédula.");
     return false;
   }
 
-  // Verificar si ya existe el email
-  if (users.some(x => x.email === email)) {
+  if (users.some(u => u.email === email)) {
     alert("Ya existe un usuario con este email.");
     return false;
   }
 
-  try {
-    // Crear nuevo usuario (sin password)
-    const nuevoUsuario = {
-      nombre: `${nombre} ${apellido}`,
-      cedula: cedula,
-      email: email,
-      fechaRegistro: new Date().toISOString().slice(0,10)
-    };
-    
-    await addItem("users", nuevoUsuario);
-    alert("Registro exitoso. Ahora puedes iniciar sesión.");
-    showLogin();
-    
-  } catch (err) {
-    console.error("Error en registro:", err);
-    alert("Error en el registro.");
-  }
-  
+  const newUser = {
+    nombre: `${nombre} ${apellido}`,
+    cedula,
+    email,
+    fechaRegistro: new Date().toISOString().slice(0, 10)
+  };
+
+  await addItem("users", newUser);
+  alert("Registro exitoso. Ahora puedes iniciar sesión.");
+  showLogin();
   return false;
 }
 
+
+// ===============================
+// CONTROL DE SESIÓN
+// ===============================
 function logout() {
   localStorage.removeItem("sessionUser");
   location.href = "index.html";
 }
 
 function ensureAuthenticated() {
-  const s = localStorage.getItem("sessionUser");
-  if (!s) {
-    location.href = "index.html";
-    return null;
-  }
-  return JSON.parse(s);
+  const session = localStorage.getItem("sessionUser");
+  if (!session) location.href = "index.html";
+  return JSON.parse(session);
 }
 
-// Protege páginas: si la página está en la lista, exige sesión
-(function protectRoutes() {
-  const protectedPages = ["dashboard.html", "clientes.html", "servicios.html", "cotizaciones.html", "reporte.html"];
-  const path = location.pathname.split("/").pop();
-  if (protectedPages.includes(path)) {
-    const s = localStorage.getItem("sessionUser");
-    if (!s) location.href = "index.html";
-  }
-})();
-
 window.login = login;
-window.logout = logout;
 window.register = register;
+window.logout = logout;
 window.ensureAuthenticated = ensureAuthenticated;
