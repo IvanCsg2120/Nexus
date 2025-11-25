@@ -91,13 +91,13 @@ async function register(e) {
 
 function logout() {
   localStorage.removeItem("sessionUser");
-  location.href = "login.html";
+  location.href = "index.html";
 }
 
 function ensureAuthenticated() {
   const s = localStorage.getItem("sessionUser");
   if (!s) {
-    location.href = "login.html";
+    location.href = "index.html";
     return null;
   }
   return JSON.parse(s);
@@ -109,7 +109,7 @@ function ensureAuthenticated() {
   const path = location.pathname.split("/").pop();
   if (protectedPages.includes(path)) {
     const s = localStorage.getItem("sessionUser");
-    if (!s) location.href = "login.html";
+    if (!s) location.href = "index.html";
   }
 })();
 
