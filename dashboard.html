@@ -3,62 +3,448 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard - Freelancer</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>Nexus Pro - Panel de Control Empresarial</title>
+  <meta name="description" content="Dashboard profesional para gestión empresarial">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/dashboard.css" />
 </head>
 <body>
-  <header class="header">
-    <img src="img/logo.png" class="logo" alt="logo"/>
-    <div>
-      <h1>Panel Principal</h1>
-      <small id="usuarioNombre" class="small"></small>
-    </div>
-    <nav class="menu-right">
-      <button class="btn" onclick="logout()">Cerrar sesión</button>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="card">
-      <h2>Módulos</h2>
-      <div class="grid">
-        <a class="tile" href="clientes.html">Clientes</a>
-        <a class="tile" href="servicios.html">Servicios</a>
-        <a class="tile" href="cotizaciones.html">Cotizaciones</a>
-        <a class="tile" href="reporte.html">Reportes</a>
+  
+  <!-- ==========================================
+       SIDEBAR LATERAL
+  ========================================== -->
+  <aside class="sidebar">
+    <!-- Header del Sidebar -->
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fas fa-cube"></i>
       </div>
-    </section>
+      <div class="sidebar-title">
+        <h2>Nexus Pro</h2>
+        <p>v.0.2.34</p>
+      </div>
+    </div>
 
-    <section id="resumen" class="card">
-      <h3>Resumen rápido</h3>
-      <div id="resumenContenido"><p class="small">Cargando...</p></div>
-    </section>
+    <!-- Usuario con botón + -->
+    <div class="sidebar-user">
+      <img src="https://ui-avatars.com/api/?name=Juan+Sanchez&background=22CA95&color=fff&bold=true" 
+           alt="Usuario" class="user-avatar-sidebar">
+      <div class="user-info-sidebar">
+        <h3 id="sidebarUserName">Juan Sánchez</h3>
+        <p id="sidebarUserRole">Administrador</p>
+      </div>
+      <div class="add-btn" title="Nuevo" onclick="openNewProjectModal()">
+        <i class="fas fa-plus"></i>
+      </div>
+    </div>
+
+      <!-- Sección Módulos -->
+      <div class="nav-section">
+        <div class="nav-section-title">Módulos</div>
+        <a href="clientes.html" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Clientes</span>
+          <span class="nav-badge" id="navBadgeClientes">24</span>
+        </a>
+        <a href="servicios.html" class="nav-item">
+          <i class="fas fa-cogs"></i>
+          <span>Servicios</span>
+          <span class="nav-badge" id="navBadgeServicios">15</span>
+        </a>
+        <a href="cotizaciones.html" class="nav-item">
+          <i class="fas fa-file-contract"></i>
+          <span>Cotizaciones</span>
+          <span class="nav-badge" id="navBadgeCotizaciones">32</span>
+        </a>
+        <a href="facturacion.html" class="nav-item">
+          <i class="fas fa-file-invoice"></i>
+          <span>Facturación</span>
+        </a>
+        <a href="calendario.html" class="nav-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Calendario</span>
+        </a>
+      </div>
+
+
+    <!-- Footer del Sidebar -->
+    <div class="sidebar-footer">
+      <div class="version-info">
+        <div class="version-icon">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <div class="version-text">
+          <h4>NexusCaster</h4>
+          <p>ver. 0.2.34</p>
+        </div>
+        <button class="version-menu">
+          <i class="fas fa-ellipsis-h"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+  ========================================== -->
+  <main class="main-wrapper">
+    
+    <!-- Header Superior del Contenido -->
+    <header class="content-topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar proyectos, clientes, tareas..." id="searchInput">
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-actions">
+          <button class="action-btn" title="Notificaciones" onclick="toggleNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="action-badge">3</span>
+          </button>
+          <button class="action-btn" title="Mensajes" onclick="toggleMessages()">
+            <i class="fas fa-envelope"></i>
+            <span class="action-badge">5</span>
+          </button>
+          <button class="action-btn" title="Configuración" onclick="window.location.href='settings.html'">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Contenido del Dashboard -->
+    <div class="dashboard-content">
+      
+      <!-- Bienvenida y Fecha -->
+      <div class="welcome-header">
+        <div class="welcome-text">
+          <h1 id="welcomeText">Buenos días, Juan 👋</h1>
+          <p id="currentDateTime">Cargando fecha...</p>
+        </div>
+        <div class="welcome-actions">
+          <button class="btn-primary" onclick="openNewProjectModal()">
+            <i class="fas fa-plus"></i>
+            Nuevo Proyecto
+          </button>
+          <button class="btn-secondary" onclick="exportReport()">
+            <i class="fas fa-download"></i>
+            Exportar
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards Mejorados -->
+      <section class="kpi-section">
+        <div class="kpi-grid">
+          <!-- KPI 1: Clientes -->
+          <div class="kpi-card" onclick="window.location.href='clientes.html'">
+            <div class="kpi-header">
+              <span class="kpi-label">Clientes Activos</span>
+              <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>12.5%</span>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <h2 class="kpi-value" id="kpiClientes">24</h2>
+              <p class="kpi-change">+3 este mes</p>
+            </div>
+          </div>
+
+          <!-- KPI 2: Servicios -->
+          <div class="kpi-card" onclick="window.location.href='servicios.html'">
+            <div class="kpi-header">
+              <span class="kpi-label">Servicios</span>
+              <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>5.2%</span>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <h2 class="kpi-value" id="kpiServicios">15</h2>
+              <p class="kpi-change">+2 este mes</p>
+            </div>
+          </div>
+
+          <!-- KPI 3: Cotizaciones -->
+          <div class="kpi-card" onclick="window.location.href='cotizaciones.html'">
+            <div class="kpi-header">
+              <span class="kpi-label">Cotizaciones</span>
+              <div class="kpi-trend negative">
+                <i class="fas fa-arrow-down"></i>
+                <span>-3.5%</span>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <h2 class="kpi-value" id="kpiCot">32</h2>
+              <p class="kpi-change">+5 este mes</p>
+            </div>
+          </div>
+
+          <!-- KPI 4: Ingresos -->
+          <div class="kpi-card" onclick="window.location.href='finanzas.html'">
+            <div class="kpi-header">
+              <span class="kpi-label">Ingresos del Mes</span>
+              <div class="kpi-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>8.7%</span>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <h2 class="kpi-value" id="kpiIngresos">$12,450</h2>
+              <p class="kpi-change">+$950 vs anterior</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grid Principal: 2 Columnas -->
+      <div class="dashboard-grid">
+        
+        <!-- Columna Izquierda: Gráfico de Audiencia -->
+        <section class="chart-section">
+          <div class="section-header">
+            <div>
+              <h3>Audiencia</h3>
+              <p class="section-subtitle">301,097 <span class="trend-indicator positive">+58.31% últimos 7 días</span></p>
+            </div>
+            <div class="chart-actions">
+              <button class="chart-period active">7D</button>
+              <button class="chart-period">30D</button>
+              <button class="chart-period">90D</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="audienceChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Columna Derecha: Satisfacción -->
+        <section class="satisfaction-section">
+          <div class="section-header">
+            <h3>Satisfacción de Audiencia</h3>
+            <button class="options-btn">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+          </div>
+          <div class="satisfaction-gauge">
+            <div class="gauge-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#2a2e33" stroke-width="8"></circle>
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#22CA95" stroke-width="8" 
+                        stroke-dasharray="283" stroke-dashoffset="70" 
+                        stroke-linecap="round" transform="rotate(-90 50 50)"></circle>
+              </svg>
+              <div class="gauge-content">
+                <div class="gauge-emoji">😊</div>
+                <div class="gauge-percentage">76.7%</div>
+              </div>
+            </div>
+            <div class="gauge-legend">
+              <span>0%</span>
+              <span class="legend-text">Basado en likes / dislikes</span>
+              <span>100%</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Sección Inferior: Proyectos Populares -->
+      <section class="projects-section">
+        <div class="section-header">
+          <h3>Episodios Populares</h3>
+          <a href="proyectos.html" class="view-all-link">Ver todo <i class="fas fa-arrow-right"></i></a>
+        </div>
+        
+        <div class="projects-table">
+          <div class="project-row">
+            <div class="project-number">1</div>
+            <div class="project-info">
+              <h4>Kuji Podcast 33: Live</h4>
+              <p>Guest: Nurlan Saburov</p>
+            </div>
+            <div class="project-stats">
+              <span class="stat-value">1.99m</span>
+              <span class="stat-badge live">Live</span>
+            </div>
+          </div>
+
+          <div class="project-row">
+            <div class="project-number">2</div>
+            <div class="project-info">
+              <h4>Kuji Podcast 20: Live</h4>
+              <p>Guest: Nurlan Saburov</p>
+            </div>
+            <div class="project-stats">
+              <span class="stat-value">1.54m</span>
+              <span class="stat-badge live">Live</span>
+            </div>
+          </div>
+
+          <div class="project-row">
+            <div class="project-number">3</div>
+            <div class="project-info">
+              <h4>Kuji Podcast 24: Live</h4>
+              <p>Guest: Nurlan Saburov</p>
+            </div>
+            <div class="project-stats">
+              <span class="stat-value">1.04m</span>
+              <span class="stat-badge live">Live</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Banner de Webinar -->
+      <section class="webinar-banner">
+        <div class="webinar-content">
+          <div class="webinar-badge">Webinars</div>
+          <h2>Aprende cómo puedes ganar más del 20% cada mes!</h2>
+          <p>Únete a nuestro webinar y aprende cómo incrementar tus ingresos mensuales en más del 20%</p>
+          <button class="btn-webinar">Más información</button>
+        </div>
+        <div class="webinar-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+      </section>
+
+    </div>
   </main>
 
+  <!-- SCRIPTS -->
   <script src="js/db.js"></script>
   <script src="js/auth.js"></script>
+
   <script>
-    // Mostrar nombre de usuario y resumen simple
+    // Inicialización
     (function init() {
       const s = localStorage.getItem("sessionUser");
-      if (!s) { location.href = "login.html"; return; }
-      const user = JSON.parse(s);
-      document.getElementById("usuarioNombre").textContent = user.nombre || user.email;
+      if (!s) { 
+        location.href = "login.html"; 
+        return; 
+      }
 
-      // Resumen simple: contar clientes/servicios/cotizaciones
-      async function cargarResumen() {
-        await openDB(); // db.js debe exponer openDB() o abrir DB al cargar
+      const user = JSON.parse(s);
+
+      // Actualizar información del usuario en sidebar
+      document.getElementById("sidebarUserName").textContent = user.nombre || "Usuario";
+      document.getElementById("sidebarUserRole").textContent = user.rol || "Administrador";
+
+      // Saludo dinámico
+      const hora = new Date().getHours();
+      let saludo = "Buenos días";
+      if (hora >= 12 && hora < 18) saludo = "Buenas tardes";
+      else if (hora >= 18) saludo = "Buenas noches";
+
+      document.getElementById("welcomeText").textContent = `${saludo}, ${user.nombre || "Usuario"} 👋`;
+
+      // Actualizar fecha y hora
+      updateDateTime();
+      setInterval(updateDateTime, 60000);
+
+      // Cargar datos desde IndexedDB
+      cargarDatos();
+
+    })();
+
+    async function cargarDatos() {
+      try {
+        await openDB();
+
         const clientes = await getAll("clientes");
         const servicios = await getAll("servicios");
-        const cotizaciones = await getAll("cotizaciones");
-        document.getElementById("resumenContenido").innerHTML = `
-          <p>Clientes: <b>${clientes.length}</b></p>
-          <p>Servicios: <b>${servicios.length}</b></p>
-          <p>Cotizaciones: <b>${cotizaciones.length}</b></p>
-        `;
+        const cot = await getAll("cotizaciones");
+
+        // Actualizar KPIs
+        document.getElementById("kpiClientes").textContent = clientes.length;
+        document.getElementById("kpiServicios").textContent = servicios.length;
+        document.getElementById("kpiCot").textContent = cot.length;
+
+        // Actualizar badges en sidebar
+        document.getElementById("navBadgeClientes").textContent = clientes.length;
+        document.getElementById("navBadgeServicios").textContent = servicios.length;
+        document.getElementById("navBadgeCotizaciones").textContent = cot.length;
+
+        // Calcular ingresos
+        const ingresoTotal = cot.reduce((sum, c) => sum + (parseFloat(c.total) || 0), 0);
+        document.getElementById("kpiIngresos").textContent = `$${ingresoTotal.toLocaleString('es-ES', {minimumFractionDigits: 2})}`;
+
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
       }
-      cargarResumen();
-    })();
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const opciones = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const fechaTexto = now.toLocaleDateString('es-ES', opciones);
+      document.getElementById("currentDateTime").textContent = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
+    }
+
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+
+    function logout() {
+      if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+        localStorage.removeItem("sessionUser");
+        location.href = "login.html";
+      }
+    }
+
+    function toggleNotifications() {
+      alert("Panel de notificaciones - En desarrollo");
+    }
+
+    function toggleMessages() {
+      alert("Panel de mensajes - En desarrollo");
+    }
+
+    function openNewProjectModal() {
+      alert("Modal de nuevo proyecto - En desarrollo");
+    }
+
+    function exportReport() {
+      alert("Exportando reporte... - En desarrollo");
+    }
+
+    // Búsqueda
+    document.getElementById("searchInput")?.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        const query = this.value.trim();
+        if (query) {
+          alert(`Buscando: "${query}" - En desarrollo`);
+        }
+      }
+    });
+
+    // Navegación activa
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        if (!this.href) {
+          document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
   </script>
 </body>
 </html>
