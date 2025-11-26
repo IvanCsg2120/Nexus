@@ -1076,3 +1076,23 @@ body {
   .section-header {
     flex-direction: column;
     align-items: flex-start
+  }
+}
+/* ==========================================
+   AJUSTES ESPECÍFICOS SOLO PARA EL LOGO
+========================================== */
+
+/* Contenedor del logo - tamaño reducido */
+.sidebar-logo {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  padding: 2px !important;
+}
+
+/* Imagen del logo - tamaño reducido */
+.logo-sidebar {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 4px !important;
+}
