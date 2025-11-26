@@ -1,4 +1,4 @@
-// js/auth.js - Versión para InfinityFree
+// js/auth.js - Versión InfinityFree
 async function register(e) {
     if (e) e.preventDefault();
 
@@ -12,19 +12,27 @@ async function register(e) {
         return false;
     }
 
+    // Verificar si ya existe
+    const users = getAll('users');
+    if (users.find(u => u.cedula === cedula)) {
+        alert("❌ Ya existe un usuario con esta cédula.");
+        return false;
+    }
+
+    // Crear usuario
     const userData = {
         nombre: `${nombre} ${apellido}`,
         cedula: cedula,
-        email: email
+        email: email,
+        rol: 'usuario'
     };
 
-    const result = await window.supabaseRegister(userData);
-
-    if (result.success) {
+    try {
+        await addItem('users', userData);
         alert("✅ Registro exitoso. Ahora puedes iniciar sesión.");
         showLogin();
-    } else {
-        alert(`❌ Error: ${result.error}`);
+    } catch (error) {
+        alert("❌ Error en el registro.");
     }
 
     return false;
@@ -41,28 +49,33 @@ async function login(e) {
         return false;
     }
 
-    const result = await window.supabaseLogin(cedula, nombreInput);
+    // Buscar usuario
+    const users = getAll('users');
+    const user = users.find(u => 
+        u.cedula === cedula && u.nombre.toLowerCase().includes(nombreInput.toLowerCase())
+    );
 
-    if (result.success) {
+    if (user) {
         // Guardar sesión
         const session = {
-            id: result.user.id,
-            nombre: result.user.nombre,
+            id: user.id,
+            nombre: user.nombre,
             cedula: cedula,
+            email: user.email,
+            rol: user.rol,
             inicio: new Date().toISOString()
         };
 
         localStorage.setItem("sessionUser", JSON.stringify(session));
-        alert(`¡Bienvenido ${result.user.nombre}!`);
+        alert(`¡Bienvenido ${user.nombre}!`);
         location.href = "dashboard.html";
     } else {
-        alert(`❌ Error: ${result.error}`);
+        alert("❌ Cédula o nombre incorrectos.");
     }
 
     return false;
 }
 
-// Funciones de transición entre login/register
 function showRegister() {
     document.getElementById("loginCard").style.display = "none";
     document.getElementById("registerCard").style.display = "block";
@@ -71,4 +84,11 @@ function showRegister() {
 function showLogin() {
     document.getElementById("registerCard").style.display = "none";
     document.getElementById("loginCard").style.display = "block";
+}
+
+function logout() {
+    if (confirm("¿Estás seguro de cerrar sesión?")) {
+        localStorage.removeItem("sessionUser");
+        location.href = "index.html";
+    }
 }
