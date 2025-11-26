@@ -1,176 +1,90 @@
-// js/auth.js - Versión actualizada
-// ===============================
-// FUNCIONES AUXILIARES
-// ===============================
-function clean(str) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+// js/db.js - Versión para InfinityFree (LocalStorage)
+class LocalDB {
+    constructor() {
+        this.storagePrefix = 'FreelancerDB_';
+        this.ready = true;
+    }
+
+    // OPERACIONES CRUD
+    getAll(table) {
+        const data = localStorage.getItem(`${this.storagePrefix}${table}`);
+        return data ? JSON.parse(data) : [];
+    }
+
+    addItem(table, item) {
+        const items = this.getAll(table);
+        item.id = item.id || Date.now();
+        items.push(item);
+        localStorage.setItem(`${this.storagePrefix}${table}`, JSON.stringify(items));
+        return item.id;
+    }
+
+    updateItem(table, id, updates) {
+        const items = this.getAll(table);
+        const index = items.findIndex(item => item.id === id);
+        if (index !== -1) {
+            items[index] = { ...items[index], ...updates };
+            localStorage.setItem(`${this.storagePrefix}${table}`, JSON.stringify(items));
+            return id;
+        }
+        return null;
+    }
+
+    deleteItem(table, id) {
+        const items = this.getAll(table).filter(item => item.id !== id);
+        localStorage.setItem(`${this.storagePrefix}${table}`, JSON.stringify(items));
+        return true;
+    }
+
+    getItem(table, id) {
+        const items = this.getAll(table);
+        return items.find(item => item.id === id) || null;
+    }
 }
 
-// ===============================
-// INICIAR SESIÓN
-// ===============================
-async function login(e) {
-  if (e) e.preventDefault();
+// CREAR INSTANCIA GLOBAL
+const db = new LocalDB();
 
-  const cedula = document.getElementById("cedula").value.trim();
-  const nombreInput = document.getElementById("nombre").value.trim();
+// FUNCIONES GLOBALES
+window.openDB = () => Promise.resolve();
+window.ensureDBReady = () => Promise.resolve(true);
+window.getAll = (table) => db.getAll(table);
+window.addItem = (table, item) => db.addItem(table, item);
+window.updateItem = (table, id, updates) => db.updateItem(table, id, updates);
+window.deleteItem = (table, id) => db.deleteItem(table, id);
+window.getItem = (table, id) => db.getItem(table, id);
 
-  if (!cedula || !nombreInput) {
-    alert("Completa cédula y nombre.");
-    return false;
-  }
-
-  await ensureDBReady();
-  const users = await getAll("users");
-
-  console.log("Usuarios en DB:", users); // Para debug
-  console.log("Buscando:", { cedula, nombreInput }); // Para debug
-
-  const matchingUser = users.find(u => {
-    const cedulaMatch = u.cedula === cedula;
-    const nombreMatch = clean(u.nombre) === clean(nombreInput);
-    console.log(`Usuario: ${u.nombre}, cédula: ${u.cedula}, match: ${cedulaMatch && nombreMatch}`); // Debug
-    return cedulaMatch && nombreMatch;
-  });
-
-  if (!matchingUser) {
-    alert("Cédula o nombre incorrectos. Usa: Cédula: 123456789, Nombre: Admin Demo");
-    return false;
-  }
-
-  const session = {
-    id: matchingUser.id,
-    nombre: matchingUser.nombre,
-    cedula: matchingUser.cedula,
-    email: matchingUser.email,
-    inicio: new Date().toISOString()
-  };
-
-  localStorage.setItem("sessionUser", JSON.stringify(session));
-  alert(`¡Bienvenido ${matchingUser.nombre}!`);
-  location.href = "dashboard.html";
-  return false;
-}
-
-// ===============================
-// REGISTRO DE USUARIO
-// ===============================
-async function register(e) {
-  if (e) e.preventDefault();
-
-  const nombre = document.getElementById("regNombre").value.trim();
-  const apellido = document.getElementById("regApellido").value.trim();
-  const cedula = document.getElementById("regCedula").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
-
-  if (!nombre || !apellido || !cedula || !email) {
-    alert("Todos los campos son obligatorios.");
-    return false;
-  }
-
-  // Validar formato de cédula (solo números)
-  if (!/^\d+$/.test(cedula)) {
-    alert("La cédula debe contener solo números.");
-    return false;
-  }
-
-  // Validar formato de email
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert("Por favor ingresa un email válido.");
-    return false;
-  }
-
-  await ensureDBReady();
-  const users = await getAll("users");
-
-  if (users.some(u => u.cedula === cedula)) {
-    alert("Ya existe un usuario con esta cédula.");
-    return false;
-  }
-
-  if (users.some(u => u.email === email)) {
-    alert("Ya existe un usuario con este email.");
-    return false;
-  }
-
-  const newUser = {
-    nombre: `${nombre} ${apellido}`.trim(),
-    cedula,
-    email,
-    fechaRegistro: new Date().toISOString().slice(0, 10)
-  };
-
-  try {
-    await addItem("users", newUser);
-    alert("✅ Registro exitoso. Ahora puedes iniciar sesión.");
-    
-    // Limpiar formulario
-    document.getElementById("registerForm").reset();
-    
-    // Volver al login
-    showLogin();
-    return false;
-  } catch (error) {
-    alert("❌ Error en el registro: " + error.message);
-    return false;
-  }
-}
-
-// ===============================
-// CONTROL DE SESIÓN
-// ===============================
-function logout() {
-  localStorage.removeItem("sessionUser");
-  alert("Sesión cerrada correctamente.");
-  location.href = "index.html";
-}
-
-function ensureAuthenticated() {
-  const session = localStorage.getItem("sessionUser");
-  if (!session) {
-    location.href = "index.html";
-    return null;
-  }
-  return JSON.parse(session);
-}
-
-// ===============================
-// VERIFICACIÓN DE DATOS DEMO
-// ===============================
-async function checkDemoData() {
-  try {
-    await ensureDBReady();
-    const users = await getAll("users");
-    console.log("Usuarios disponibles:", users);
-    
-    if (users.length === 0) {
-      console.warn("No hay usuarios en la base de datos");
+// FUNCIONES DE AUTH (simuladas)
+window.supabaseRegister = async (userData) => {
+    // Simular registro
+    const users = db.getAll('users');
+    if (users.find(u => u.cedula === userData.cedula)) {
+        return { success: false, error: 'Usuario ya existe' };
     }
     
-    return users;
-  } catch (error) {
-    console.error("Error verificando datos demo:", error);
-    return [];
-  }
-}
+    const newUser = {
+        id: Date.now(),
+        nombre: userData.nombre,
+        cedula: userData.cedula,
+        email: userData.email,
+        created_at: new Date().toISOString()
+    };
+    
+    db.addItem('users', newUser);
+    return { success: true, user: newUser };
+};
 
-// ===============================
-// EXPORT FUNCTIONS
-// ===============================
-window.login = login;
-window.register = register;
-window.logout = logout;
-window.ensureAuthenticated = ensureAuthenticated;
-window.checkDemoData = checkDemoData;
+window.supabaseLogin = async (cedula, nombre) => {
+    // Simular login
+    const users = db.getAll('users');
+    const user = users.find(u => 
+        u.cedula === cedula && u.nombre.toLowerCase().includes(nombre.toLowerCase())
+    );
+    
+    if (user) {
+        return { success: true, user };
+    }
+    return { success: false, error: 'Credenciales incorrectas' };
+};
 
-// Verificar datos al cargar
-window.addEventListener('load', function() {
-  setTimeout(() => {
-    checkDemoData();
-  }, 1000);
-});
+console.log('✅ Local DB cargada para InfinityFree');
