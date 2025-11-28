@@ -988,8 +988,9 @@ body {
     width: 100%;
     justify-content: center;
   }
- }
-   select {
+}
+
+select {
     background-color: #111827 !important;
     border: 1px solid #374151 !important;
     color: #e5e7eb !important;
@@ -1012,7 +1013,3 @@ select option:checked {
     background-color: #2563eb !important;
     color: white !important;
 }
-
-
-}
-
