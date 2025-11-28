@@ -988,7 +988,7 @@ body {
     width: 100%;
     justify-content: center;
   }
-
+ }
    select {
     background-color: #111827 !important;
     border: 1px solid #374151 !important;
@@ -1015,3 +1015,4 @@ select option:checked {
 
 
 }
+
