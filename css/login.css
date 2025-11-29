@@ -42,7 +42,9 @@ body {
   );
   background-size: 400% 400%;
   animation: bgShift 15s ease-in-out infinite;
-  overflow: hidden;
+  /* Permitimos solo scroll vertical */
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 20px;
   position: relative;
 }
@@ -256,8 +258,10 @@ body::after {
   gap: 80px;
   width: 100%;
   max-width: 1400px;
+  min-height: 100vh; /* Aseguramos que ocupe al menos toda la altura de la ventana */
   z-index: 2;
   position: relative;
+  padding: 40px 0; /* Añadimos padding vertical para separación */
 }
 
 /* ==========================================
@@ -664,6 +668,8 @@ a:hover {
   .auth-container {
     flex-direction: column;
     gap: 50px;
+    min-height: auto; /* Permitimos que crezca según el contenido */
+    padding: 60px 0; /* Más padding en móvil */
   }
 
   .welcome-section {
@@ -689,6 +695,10 @@ a:hover {
 }
 
 @media (max-width: 500px) {
+  .auth-container {
+    padding: 40px 0; /* Ajustamos padding para móviles pequeños */
+  }
+
   .card {
     padding: 42px 32px;
     border-radius: 26px;
