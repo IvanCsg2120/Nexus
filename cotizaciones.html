@@ -11,13 +11,14 @@
 <body>
   
   <!-- ==========================================
-       SIDEBAR LATERAL
+       SIDEBAR LATERAL CON LOGO Y NAVEGACIÓN
   ========================================== -->
   <aside class="sidebar">
-    <!-- Header del Sidebar -->
-    <div class="sidebar-header">
+    <!-- Header del Sidebar CON LOGO Y NAVEGACIÓN AL INICIO -->
+    <div class="sidebar-header" onclick="irAlInicio()" title="Ir al Inicio">
       <div class="sidebar-logo">
-        <i class="fas fa-cube"></i>
+        <!-- TU LOGO AQUÍ -->
+        <img src="img/logo.png" alt="Nexus Pro Logo" class="logo-sidebar">
       </div>
       <div class="sidebar-title">
         <h2>Nexus </h2>
@@ -27,11 +28,11 @@
 
     <!-- Usuario con botón + -->
     <div class="sidebar-user">
-      <img src="https://ui-avatars.com/api/?name=Juan+Sanchez&background=22CA95&color=fff&bold=true" 
+      <img src="https://ui-avatars.com/api/?name=Luis+Soto&background=22CA95&color=fff&bold=true" 
            alt="Usuario" class="user-avatar-sidebar">
       <div class="user-info-sidebar">
-        <h3 id="sidebarUserName">Juan Sánchez</h3>
-        <p id="sidebarUserRole">Administrador</p>
+        <h3 id="sidebarUserName">Luis Soto</h3>
+        <p id="sidebarUserRole">Usuario</p>
       </div>
       <div class="add-btn" title="Nuevo" onclick="openNewClientModal()">
         <i class="fas fa-plus"></i>
@@ -40,23 +41,25 @@
 
     <!-- Sección Módulos -->
     <div class="nav-section">
-      <div class="nav-section-title">Módulos</div>
-      <a href="dashboard.html" class="nav-item">
-        <i class="fas fa-tachometer-alt"></i>
-        <span>Dashboard</span>
-      </a>
+      <div class="nav-section-title">MÓDULOS</div>
       <a href="clientes.html" class="nav-item">
         <i class="fas fa-users"></i>
         <span>Clientes</span>
+        <span class="nav-badge" id="navBadgeClientes"></span>
       </a>
       <a href="servicios.html" class="nav-item">
         <i class="fas fa-cogs"></i>
         <span>Servicios</span>
+        <span class="nav-badge" id="navBadgeServicios"></span>
       </a>
       <a href="cotizaciones.html" class="nav-item active">
         <i class="fas fa-file-contract"></i>
         <span>Cotizaciones</span>
         <span class="nav-badge" id="navBadgeCotizaciones">0</span>
+      </a>
+      <a href="calendario.html" class="nav-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Calendario</span>
       </a>
     </div>
 
@@ -96,11 +99,11 @@
 
       <div class="topbar-right">
         <div class="topbar-actions">
-          <button class="action-btn" title="Notificaciones" onclick="window.location.href='notificaciones.html'">
+          <button class="action-btn" title="Notificaciones" onclick="toggleNotifications()">
             <i class="fas fa-bell"></i>
             <span class="action-badge">8</span>
           </button>
-          <button class="action-btn" title="Mensajes" onclick="window.location.href='mensajes.html'">
+          <button class="action-btn" title="Mensajes" onclick="toggleMessages()">
             <i class="fas fa-envelope"></i>
             <span class="action-badge">4</span>
           </button>
@@ -281,6 +284,14 @@
   <script src="js/auth.js"></script>
   <script src="js/cotizaciones.js"></script>
   <script>
+    // ==========================================
+    // FUNCIÓN PARA IR AL INICIO
+    // ==========================================
+    function irAlInicio() {
+      window.location.href = 'dashboard.html';
+      mostrarNotificacion('🏠 Redirigiendo al inicio...', 'success');
+    }
+
     // Funciones auxiliares para la UI
     function toggleSidebar() {
       document.querySelector('.sidebar').classList.toggle('active');
@@ -295,6 +306,10 @@
 
     function toggleNotifications() {
       alert("Panel de notificaciones - En desarrollo");
+    }
+
+    function toggleMessages() {
+      alert("Sistema de mensajes - En desarrollo");
     }
 
     function openNewClientModal() {
@@ -313,6 +328,56 @@
       document.getElementById('cot_cantidad').value = 1;
     }
 
+    // Función para mostrar notificaciones
+    function mostrarNotificacion(mensaje, tipo = 'success') {
+      const notificacion = document.createElement('div');
+      const bgColor = tipo === 'success' ? 'var(--mountain-meadow)' : '#FF6B6B';
+      
+      notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        z-index: 1001;
+        font-weight: 600;
+        transition: all 0.4s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 400px;
+        transform: translateX(100px);
+        opacity: 0;
+      `;
+      
+      notificacion.innerHTML = `
+        <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+        <span>${mensaje}</span>
+      `;
+      
+      document.body.appendChild(notificacion);
+      
+      // Animación de entrada
+      setTimeout(() => {
+        notificacion.style.transform = 'translateX(0)';
+        notificacion.style.opacity = '1';
+      }, 10);
+      
+      // Remover después de 4 segundos
+      setTimeout(() => {
+        notificacion.style.transform = 'translateX(100px)';
+        notificacion.style.opacity = '0';
+        setTimeout(() => {
+          if (document.body.contains(notificacion)) {
+            document.body.removeChild(notificacion);
+          }
+        }, 400);
+      }, 4000);
+    }
+
     // Inicialización de la página
     (async function init() {
       const s = localStorage.getItem("sessionUser");
@@ -322,8 +387,8 @@
       }
 
       const user = JSON.parse(s);
-      document.getElementById("sidebarUserName").textContent = user.nombre || "Usuario";
-      document.getElementById("sidebarUserRole").textContent = user.rol || "Administrador";
+      document.getElementById("sidebarUserName").textContent = user.nombre || "Luis Soto";
+      document.getElementById("sidebarUserRole").textContent = user.rol || "Usuario";
 
       // Actualizar resumen después de cargar datos
       setTimeout(actualizarResumenGeneral, 500);
@@ -360,5 +425,3 @@
   </script>
 </body>
 </html>
-
-
